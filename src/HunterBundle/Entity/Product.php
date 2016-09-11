@@ -330,9 +330,9 @@ class Product
      */
     // public function addStore(\HunterBundle\Entity\StoreProduct $store)
     // {
-    //     $this->store[] = $store;
+        // $this->store[] = $store;
 
-    //     return $this;
+        // return $this;
     // }
 
     /**
@@ -342,7 +342,7 @@ class Product
      */
     // public function removeStore(\HunterBundle\Entity\StoreProduct $store)
     // {
-    //     $this->store->removeElement($store);
+        // $this->store->removeElement($store);
     // }
 
     /**
