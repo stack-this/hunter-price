@@ -52,7 +52,7 @@ class Product
     /**
      * @var string
      *
-     * @ORM\Column(name="last_update", type="string")
+     * @ORM\Column(name="last_update", type="date")
      */
     private $lastUpdate;
 
@@ -88,14 +88,14 @@ class Product
      *
      * @ORM\OneToMany(targetEntity="StoreProduct", mappedBy="id_product", cascade={"persist"})
      */
-    private $store;
+    // private $store;
 
     /**
      * @var string
      *
      * @ORM\OneToMany(targetEntity="ListsProduct", mappedBy="id_product")
      */
-    private $lists;
+    // private $lists;
 
     /**
      * Get id
@@ -328,30 +328,30 @@ class Product
      * @param \HunterBundle\Entity\StoreProduct $store
      * @return Product
      */
-    public function addStore(\HunterBundle\Entity\StoreProduct $store)
-    {
-        $this->store[] = $store;
+    // public function addStore(\HunterBundle\Entity\StoreProduct $store)
+    // {
+    //     $this->store[] = $store;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * Remove store
      *
      * @param \HunterBundle\Entity\StoreProduct $store
      */
-    public function removeStore(\HunterBundle\Entity\StoreProduct $store)
-    {
-        $this->store->removeElement($store);
-    }
+    // public function removeStore(\HunterBundle\Entity\StoreProduct $store)
+    // {
+    //     $this->store->removeElement($store);
+    // }
 
     /**
      * Get store
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getStore()
-    {
-        return $this->store;
-    }
+    // public function getStore()
+    // {
+    //     return $this->store;
+    // }
 }

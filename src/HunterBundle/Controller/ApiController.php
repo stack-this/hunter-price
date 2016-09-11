@@ -42,7 +42,10 @@ class ApiController extends Controller
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        $products = $em->getRepository('HunterBundle:Product')->findAll(10);
+        $products = $em->getRepository('HunterBundle:Product')->findAll(array('name' => 'ASC'));
+
+        // dump($products);
+        // die();
 
         $result = $serializer->serialize($products, 'json');
 
@@ -57,12 +60,15 @@ class ApiController extends Controller
      */
     public function productGetOneAction($slug)
     {
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
+       $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
-        $em = $this->getDoctrine()->getManager();
 
+        $em = $this->getDoctrine()->getManager();
         $product = $em->getRepository('HunterBundle:Product')->findById($slug);
+
+        // dump($product);
+        // die();
 
         $result = $serializer->serialize($product, 'json');
 
@@ -238,7 +244,7 @@ class ApiController extends Controller
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        $categories = $em->getRepository('HunterBundle:Category')->findAll();
+        $categories = $em->getRepository('HunterBundle:Category')->findAll(array('name'=>'ASC'));
 
         $result = $serializer->serialize($categories, 'json');
 
