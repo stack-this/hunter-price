@@ -18,6 +18,7 @@ use HunterBundle\Entity\Users;
 use HunterBundle\Entity\Lists;
 use HunterBundle\Entity\Store;
 use HunterBundle\Entity\Society;
+use HunterBundle\Entity\StoreProduct;
 
 /**
  * Api controller.
@@ -93,16 +94,21 @@ class ApiController extends Controller
 
 
         foreach($decoded as $decode){
-            $product = new Product();
-            $product->setName($decode['producto']);
-            $product->setTrademark($decode['marca']);
+            $repository = $em->getRepository('HunterBundle:Product');
+            $product = $repository->findOneByName($decode['producto']);
 
-            if($product->getLowerPrice() == NULL || $decode['precio'] < $product->getLowerPrice()){
-                $product->setLowerPrice($decode['precio']);
+            if (!$product){
+                $product = new Product();
+                $product->setName($decode['producto']);
             }
-            if($product->getHigherPrice() == NULL || $decode['precio'] > $product->getHigherPrice()){
-                $product->setHigherPrice($decode['precio']);
-            }
+
+            if($decode['marca'] != 'SIN MARCA')
+                $product->setName($decode['producto'].' '. $decode['marca']);
+            
+            $product->setTrademark($decode['marca']);
+                
+            $product->setLowerPrice(0);
+            $product->setHigherPrice(0);
 
             $product->setLastUpdate(date('Y-m-d'));
             $product->setDescription($decode['presentacion']);
@@ -114,9 +120,9 @@ class ApiController extends Controller
             if(!$category){
                 $category = $repository->findOneByName('Unknown');
             }
-                $product->setCategory($category);
-                $em->persist($category);
 
+            $product->setCategory($category);
+            $em->persist($category);
             $em->persist($product);
         }
         $em->flush();
@@ -280,7 +286,6 @@ class ApiController extends Controller
 /*
 ************************************************************************* USER
 */
-
     /**
      * @Route("/user/", name="api_user_getall")
      * @Method("GET")
@@ -292,9 +297,9 @@ class ApiController extends Controller
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        $categories = $em->getRepository('HunterBundle:User')->findAll();
+        $users = $em->getRepository('HunterBundle:Users')->findAll();
 
-        $result = $serializer->serialize($categories, 'json');
+        $result = $serializer->serialize($users, 'json');
 
         return new Response($result);
     }
@@ -310,9 +315,9 @@ class ApiController extends Controller
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        $category = $em->getRepository('HunterBundle:User')->findById($slug);
+        $user = $em->getRepository('HunterBundle:Users')->findById($slug);
 
-        $result = $serializer->serialize($category, 'json');
+        $result = $serializer->serialize($user, 'json');
 
         return new Response($result);
     }
@@ -322,6 +327,79 @@ class ApiController extends Controller
      * @Method("POST")
      */
     public function userPostAction()
+    {
+        $encoder = new JsonEncoder();
+        $normalizer = new ObjectNormalizer();
+
+        $serializer = new Serializer(
+            array($normalizer, new ArrayDenormalizer()),
+            array($encoder));
+
+        $em = $this->getDoctrine()->getManager();
+
+        $content = $this->get("request")->getContent();
+        $decoded = $serializer->decode($content, 'json');
+
+        $user = new Users();
+        $user->setNickname($decoded['nickname']);
+        $user->setPassword($decoded['password']);
+        $user->setEmail($decoded['email']);
+        $user->setRange(10);
+
+        $em->persist($user);
+
+        $em->flush();
+
+        $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+
+    /**
+     * @Route("/user/login/", name="api_user_login")
+     * @Method("POST")
+     */
+    public function userLoginAction()
+    {
+        $encoder = new JsonEncoder();
+        $normalizer = new ObjectNormalizer();
+
+        $serializer = new Serializer(
+            array($normalizer, new ArrayDenormalizer()),
+            array($encoder));
+
+        $em = $this->getDoctrine()->getManager();
+
+        $content = $this->get("request")->getContent();
+        $decoded = $serializer->decode($content, 'json');
+
+        $user = new Users();
+        $user->setNickname($decoded['nickname']);
+        $user->setPassword($decoded['password']);
+
+        $login = $em->getRepository('HunterBundle:Users')->findOneByNickname($user->getNickname());
+
+        if ($login)
+            if($login->getPassword() === $user->getPassword())
+                $content = json_encode( array("result" => 'true') );
+            else
+                $content = json_encode( array("result" => 'false', "error" => "Contraseña Incorrecta") );
+        else
+            $content = json_encode( array("result" => 'false', "error" => "Usuario Incorrecto") );
+
+        $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+
+/*
+************************************************************************* PRODUCT - STORE
+*/
+    /**
+     * @Route("/storeproduct/", name="api_storeproduct_post")
+     * @Method("POST")
+     */
+    public function storeProductAction()
     {
         $encoder = new JsonEncoder();
         $normalizer = new ObjectNormalizer();
@@ -336,19 +414,72 @@ class ApiController extends Controller
         $content = $this->get("request")->getContent();
         $decoded = $serializer->decode($content, 'json');
 
-        var_dump($content);
+        // var_dump($decoded);
 
-        foreach($decoded as $decode)
-        {
-            $category = new Category();
-            $category->setName($decode);
-            $em->persist($category);
-        }    
+            $product = $em->getRepository('HunterBundle:Product')->findOneByName('PAN DE CAJA');
+        // foreach($decoded as $decode){
+            // echo $decode['nombreComercial']. " -> ". $decode['producto'].'<br>';
+            var_dump($product);
+            // $product = $repository->findOneByName('PAN DE CAJA');
 
-        $em->flush();
+            // $repository = $em->getRepository('HunterBundle:Store');
+            // $store = $repository->findOneById(5000);
+
+            // var_dump($store);
+
+            // $storeProduct = new storeProduct();
+
+            // if($producto)
+            //     $storeProduct->setIdProduct($product->getId());
+
+            // if($store)
+            //     $storeProduct->setIdStore($store->getId());
+
+            //     $storeProduct->setPrice($decoded['precio']);
+            
+
+            // var_dump($storeProduct);
+
+        //     if (!$product){
+        //         $product = new Product();
+        //         $product->setName($decode['producto']);
+        //     }
+
+        //     if($decode['marca'] != 'SIN MARCA')
+        //         $product->setName($decode['producto'].' '. $decode['marca']);
+            
+        //     $product->setTrademark($decode['marca']);
+                
+        //     $product->setLowerPrice(0);
+        //     $product->setHigherPrice(0);
+
+        //     $product->setLastUpdate(date('Y-m-d'));
+        //     $product->setDescription($decode['presentacion']);
+
+        //     $category = new Category();
+        //     $repository = $em->getRepository('HunterBundle:Category');
+        //     $category = $repository->findOneByName($decode['categoria']);
+
+        //     if(!$category){
+        //         $category = $repository->findOneByName('Unknown');
+        //     }
+
+        //     $product->setCategory($category);
+        //     $em->persist($category);
+        //     $em->persist($product);
+        // }
+        // $em->flush();
+
+        $content = '';
 
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+/*
+************************************************************************* USER - STORE
+*/
+
+
 }

@@ -45,7 +45,7 @@ class Users
     /**
      * @var int
      *
-     * @ORM\Column(name="range", type="integer")
+     * @ORM\Column(name="`range`", type="integer")
      */
     private $range;
 
