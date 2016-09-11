@@ -46,9 +46,8 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($products, 'json');
 
-        $response = new Response($result);
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-
         return $response;
     }
 
@@ -67,9 +66,8 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($product, 'json');
 
-        $response = new Response($result);
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-
         return $response;
     }
 
@@ -127,6 +125,7 @@ class ApiController extends Controller
         }
         $em->flush();
 
+        $content = json_encode( array("result" => 'true') );
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
@@ -150,9 +149,9 @@ class ApiController extends Controller
         $stores = $em->getRepository('HunterBundle:Store')->findAll();
 
         $result = $serializer->serialize($stores, 'json');
-        $response = new Response($result);
-        $response->headers->set('Content-Type', 'application/json');
 
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
+        $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
 
@@ -169,9 +168,8 @@ class ApiController extends Controller
 
         $store = $em->getRepository('HunterBundle:Store')->findById($slug);
 
-        $response = new Response($store);
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-
         return $response;
     }
 
@@ -203,6 +201,7 @@ class ApiController extends Controller
         }    
         $em->flush();
 
+        $content = json_encode( array("result" => 'true') );
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
@@ -227,8 +226,9 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($categories, 'json');
 
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-        return new Response($result);
+        return $response;
     }
 
 	/**
@@ -246,8 +246,9 @@ class ApiController extends Controller
 
 		$result = $serializer->serialize($category, 'json');
 
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-		return new Response($result);
+        return $response;
 	}
 
     /**
@@ -280,6 +281,7 @@ class ApiController extends Controller
 
         $em->flush();
 
+        $content = json_encode( array("result" => 'true') );
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
@@ -303,8 +305,9 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($users, 'json');
 
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-        return new Response($result);
+        return $response;
     }
 
     /**
@@ -322,8 +325,9 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($user, 'json');
 
+        $response = new Response($result, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
-        return new Response($result);
+        return $response;
     }
 
     /**
@@ -354,6 +358,7 @@ class ApiController extends Controller
 
         $em->flush();
 
+        $content = json_encode( array("result" => 'true') );
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
@@ -417,11 +422,13 @@ class ApiController extends Controller
         $content = $this->get("request")->getContent();
         $decoded = $serializer->decode($content, 'json');
 
-        var_dump($content);
-        echo $decoded;
+        foreach ($decoded as $decode) {
+            var_dump($decode);
+            $name_aux = $decode['producto'].' '.$decode['marca'];
+            echo $name_aux;
+        }
 
-        $content = '';
-
+        $content = json_encode( array("result" => 'true') );
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
