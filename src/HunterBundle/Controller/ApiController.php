@@ -97,7 +97,8 @@ class ApiController extends Controller
 
             if($product->getLowerPrice() == NULL || $decode['precio'] < $product->getLowerPrice()){
                 $product->setLowerPrice($decode['precio']);
-            } else if($product->getHigherPrice() == NULL || $decode['precio'] > $product->getHigherPrice()){
+            }
+            if($product->getHigherPrice() == NULL || $decode['precio'] > $product->getHigherPrice()){
                 $product->setHigherPrice($decode['precio']);
             }
 
@@ -105,16 +106,15 @@ class ApiController extends Controller
             $product->setDescription($decode['presentacion']);
 
             $category = new Category();
-            $category_query = $em->getRepository('HunterBundle:Category')->findByName($decode['categoria']);
-            var_dump($category_query);
-            die();
+            $repository = $em->getRepository('HunterBundle:Category');
+            $category = $repository->findOneByName($decode['categoria']);
+            dump($category);
             $product->setCategory($category);
-            var_dump($product);
-            
+            dump($product);
+
             $em->persist($category);
             $em->persist($product);
         }
-        die();
         $em->flush();
 
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
