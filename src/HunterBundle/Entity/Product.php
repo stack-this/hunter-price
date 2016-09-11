@@ -86,7 +86,7 @@ class Product
     /**
      * @var string
      *
-     * @ORM\OneToMany(targetEntity="StoreProduct", mappedBy="id_product")
+     * @ORM\OneToMany(targetEntity="StoreProduct", mappedBy="id_product", cascade={"persist"})
      */
     private $store;
 

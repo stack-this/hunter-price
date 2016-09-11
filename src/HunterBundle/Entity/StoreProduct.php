@@ -24,7 +24,7 @@ class StoreProduct
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Store", inversedBy="product")
+     * @ORM\ManyToOne(targetEntity="Store", inversedBy="product", cascade={"persist"})
      * @ORM\JoinColumn(name="id_store", referencedColumnName="id")
      */
     private $id_store;
@@ -32,7 +32,7 @@ class StoreProduct
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Product", inversedBy="store")
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="store", cascade={"persist"})
      * @ORM\JoinColumn(name="id_product", referencedColumnName="id")
      */
     private $id_product;
