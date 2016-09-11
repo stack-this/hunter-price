@@ -303,6 +303,7 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($users, 'json');
 
+        $response->headers->set('Content-Type', 'application/json');
         return new Response($result);
     }
 
@@ -321,6 +322,7 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($user, 'json');
 
+        $response->headers->set('Content-Type', 'application/json');
         return new Response($result);
     }
 
