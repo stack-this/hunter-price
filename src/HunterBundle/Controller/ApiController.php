@@ -1,6 +1,6 @@
 <?php
 namespace HunterBundle\Controller;
-
+ini_set('memory_limit', '-1');
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -227,6 +227,7 @@ class ApiController extends Controller
 
         $result = $serializer->serialize($categories, 'json');
 
+        $response->headers->set('Content-Type', 'application/json');
         return new Response($result);
     }
 
@@ -245,6 +246,7 @@ class ApiController extends Controller
 
 		$result = $serializer->serialize($category, 'json');
 
+        $response->headers->set('Content-Type', 'application/json');
 		return new Response($result);
 	}
 
@@ -403,7 +405,6 @@ class ApiController extends Controller
     {
         $encoder = new JsonEncoder();
         $normalizer = new ObjectNormalizer();
-        $normalizer->setIgnoredAttributes(array('category'));
 
         $serializer = new Serializer(
             array($normalizer, new ArrayDenormalizer()),
@@ -414,61 +415,8 @@ class ApiController extends Controller
         $content = $this->get("request")->getContent();
         $decoded = $serializer->decode($content, 'json');
 
-        // var_dump($decoded);
-
-            $product = $em->getRepository('HunterBundle:Product')->findOneByName('PAN DE CAJA');
-        // foreach($decoded as $decode){
-            // echo $decode['nombreComercial']. " -> ". $decode['producto'].'<br>';
-            var_dump($product);
-            // $product = $repository->findOneByName('PAN DE CAJA');
-
-            // $repository = $em->getRepository('HunterBundle:Store');
-            // $store = $repository->findOneById(5000);
-
-            // var_dump($store);
-
-            // $storeProduct = new storeProduct();
-
-            // if($producto)
-            //     $storeProduct->setIdProduct($product->getId());
-
-            // if($store)
-            //     $storeProduct->setIdStore($store->getId());
-
-            //     $storeProduct->setPrice($decoded['precio']);
-            
-
-            // var_dump($storeProduct);
-
-        //     if (!$product){
-        //         $product = new Product();
-        //         $product->setName($decode['producto']);
-        //     }
-
-        //     if($decode['marca'] != 'SIN MARCA')
-        //         $product->setName($decode['producto'].' '. $decode['marca']);
-            
-        //     $product->setTrademark($decode['marca']);
-                
-        //     $product->setLowerPrice(0);
-        //     $product->setHigherPrice(0);
-
-        //     $product->setLastUpdate(date('Y-m-d'));
-        //     $product->setDescription($decode['presentacion']);
-
-        //     $category = new Category();
-        //     $repository = $em->getRepository('HunterBundle:Category');
-        //     $category = $repository->findOneByName($decode['categoria']);
-
-        //     if(!$category){
-        //         $category = $repository->findOneByName('Unknown');
-        //     }
-
-        //     $product->setCategory($category);
-        //     $em->persist($category);
-        //     $em->persist($product);
-        // }
-        // $em->flush();
+        var_dump($content);
+        echo $decoded;
 
         $content = '';
 
