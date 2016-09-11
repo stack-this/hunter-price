@@ -1,1 +1,1 @@
-# hunter-price
+# HunterPrice

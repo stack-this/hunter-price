@@ -1,0 +1,43 @@
+imports:
+    - { resource: config.yml }
+
+#framework:
+#    validation:
+#        cache: validator.mapping.cache.apc
+#    serializer:
+#        cache: serializer.mapping.cache.apc
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type:  console
+
+# Doctrine Configuration
+# doctrine:
+#     dbal:
+#         driver:   pdo_mysql
+#         host:     107.180.28.114
+#         port:     null
+#         dbname:   hunterprice
+#         user:     hunterprice
+#         password: 2axcG(6)dlml
+#         charset:  UTF8
+
+#     orm:
+#         auto_generate_proxy_classes: "%kernel.debug%"
+#         naming_strategy: doctrine.orm.naming_strategy.underscore
+#         auto_mapping: true

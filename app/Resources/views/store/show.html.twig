@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Store</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ store.id }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ store.location }}</td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td>{{ store.address }}</td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td>{{ store.phone }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('store_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('store_edit', { 'id': store.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Store list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Location</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for store in stores %}
+            <tr>
+                <td><a href="{{ path('store_show', { 'id': store.id }) }}">{{ store.id }}</a></td>
+                <td>{{ store.location }}</td>
+                <td>{{ store.address }}</td>
+                <td>{{ store.phone }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('store_show', { 'id': store.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('store_edit', { 'id': store.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('store_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}
