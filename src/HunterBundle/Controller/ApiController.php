@@ -1,5 +1,4 @@
 <?php
-
 namespace HunterBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +26,10 @@ use HunterBundle\Entity\Society;
  */
 class ApiController extends Controller
 {
+/*
+************************************************************************* PRODUCTS
+*/
+
     /**
      * @Route("/product/", name="api_product_getall")
      * @Method("GET")
@@ -90,7 +93,6 @@ class ApiController extends Controller
 
 
         foreach($decoded as $decode){
-            var_dump($decode);
             $product = new Product();
             $product->setName($decode['producto']);
             $product->setTrademark($decode['marca']);
@@ -108,11 +110,13 @@ class ApiController extends Controller
             $category = new Category();
             $repository = $em->getRepository('HunterBundle:Category');
             $category = $repository->findOneByName($decode['categoria']);
-            dump($category);
-            $product->setCategory($category);
-            dump($product);
 
-            $em->persist($category);
+            if(!$category){
+                $category = $repository->findOneByName('Unknown');
+            }
+                $product->setCategory($category);
+                $em->persist($category);
+
             $em->persist($product);
         }
         $em->flush();
@@ -123,7 +127,7 @@ class ApiController extends Controller
     }
 
 /*
-************************************************************************* PRODUCTS
+************************************************************************* STORE
 */
 
     /**
@@ -171,15 +175,26 @@ class ApiController extends Controller
      */
     public function storePostAction()
     {
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer());
-        $serializer = new Serializer($normalizers, $encoders);
+        $encoder = new JsonEncoder();
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setIgnoredAttributes(array('category'));
+
+        $serializer = new Serializer(
+            array($normalizer, new ArrayDenormalizer()),
+            array($encoder));
+
         $em = $this->getDoctrine()->getManager();
 
         $content = $this->get("request")->getContent();
+        $decoded = $serializer->decode($content, 'json');
 
-        $result = $serializer->deserialize($content, 'Hunter\Store', 'json');
-        $em->persist($result);
+        foreach($decoded as $decode)
+        {
+            $store = new Store();
+            $store->setAddress($decode['nombreComercial']);
+            $store->setLocation('('.$decode['longitud'].', '.$decode['latitud'].')');
+            $em->persist($store);
+        }    
         $em->flush();
 
         $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
@@ -188,8 +203,8 @@ class ApiController extends Controller
     }
 
 /*
-************************************************************************* STORE
-*/
+************************************************************************* CATEGORY
+*/ 
 
 	/**
      * @Route("/category/", name="api_category_getall")
@@ -263,6 +278,77 @@ class ApiController extends Controller
     }
 
 /*
-************************************************************************* CATEGORY
-*/    
+************************************************************************* USER
+*/
+
+    /**
+     * @Route("/user/", name="api_user_getall")
+     * @Method("GET")
+     */
+    public function userGetAllAction()
+    {
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        $em = $this->getDoctrine()->getManager();
+
+        $categories = $em->getRepository('HunterBundle:User')->findAll();
+
+        $result = $serializer->serialize($categories, 'json');
+
+        return new Response($result);
+    }
+
+    /**
+     * @Route("/user/{slug}", name="api_user_getone")
+     * @Method("GET")
+     */
+    public function userGetOneAction($slug)
+    {
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        $em = $this->getDoctrine()->getManager();
+
+        $category = $em->getRepository('HunterBundle:User')->findById($slug);
+
+        $result = $serializer->serialize($category, 'json');
+
+        return new Response($result);
+    }
+
+    /**
+     * @Route("/user/", name="api_user_post")
+     * @Method("POST")
+     */
+    public function userPostAction()
+    {
+        $encoder = new JsonEncoder();
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setIgnoredAttributes(array('category'));
+
+        $serializer = new Serializer(
+            array($normalizer, new ArrayDenormalizer()),
+            array($encoder));
+
+        $em = $this->getDoctrine()->getManager();
+
+        $content = $this->get("request")->getContent();
+        $decoded = $serializer->decode($content, 'json');
+
+        var_dump($content);
+
+        foreach($decoded as $decode)
+        {
+            $category = new Category();
+            $category->setName($decode);
+            $em->persist($category);
+        }    
+
+        $em->flush();
+
+        $response = new Response($content, Response::HTTP_I_AM_A_TEAPOT);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
 }

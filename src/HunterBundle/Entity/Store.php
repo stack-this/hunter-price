@@ -38,7 +38,7 @@ class Store
     /**
      * @var string
      *
-     * @ORM\Column(name="phone", type="string", length=32, unique=true)
+     * @ORM\Column(name="phone", type="string", length=32, nullable=true)
      */
     private $phone;
 
